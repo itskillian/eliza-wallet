@@ -21,6 +21,7 @@ import {
 import { defaultCharacter } from "./defaultCharacter.ts";
 
 import { bootstrapPlugin } from "@elizaos/plugin-bootstrap";
+import { agentKitPlugin } from "@elizaos/plugin-agentkit";
 
 import fs from "fs";
 import net from "net";
@@ -611,6 +612,7 @@ export async function createAgent(
         // character.plugins are handled when clients are added
         plugins: [
             bootstrapPlugin,
+            agentKitPlugin,
         ]
             .flat()
             .filter(Boolean),
