@@ -107,11 +107,7 @@ importers:
         version: 9.1.7
       jest:
         specifier: ^29.7.0
-<<<<<<< HEAD
-        version: 29.7.0(@types/node@22.13.5)(ts-node@10.9.2(@swc/core@1.11.5(@swc/helpers@0.5.15))(@types/node@22.13.5)(typescript@5.6.3))
-=======
         version: 29.7.0(@types/node@22.13.7)
->>>>>>> cef3996b9 (feat: add multisig contract)
       lerna:
         specifier: 8.1.5
         version: 8.1.5(@swc/core@1.11.5(@swc/helpers@0.5.15))(encoding@0.1.13)
@@ -280,13 +276,8 @@ importers:
         specifier: ^8.19.1
         version: 8.25.0(eslint@9.21.0(jiti@1.21.7))(typescript@5.6.3)
       '@vitejs/plugin-react-swc':
-<<<<<<< HEAD
         specifier: ^3.8.0
-        version: 3.8.0(@swc/helpers@0.5.15)(vite@6.2.0(@types/node@22.13.5)(jiti@1.21.7)(terser@5.39.0)(yaml@2.7.0))
-=======
-        specifier: ^3.5.0
         version: 3.8.0(@swc/helpers@0.5.15)(vite@6.2.0(@types/node@22.13.7)(jiti@1.21.7)(terser@5.39.0)(yaml@2.7.0))
->>>>>>> cef3996b9 (feat: add multisig contract)
       autoprefixer:
         specifier: ^10.4.19
         version: 10.4.20(postcss@8.5.3)
@@ -17259,9 +17250,6 @@ snapshots:
       jest-util: 29.7.0
       slash: 3.0.0
 
-<<<<<<< HEAD
-  '@jest/core@29.7.0(ts-node@10.9.2(@swc/core@1.11.5(@swc/helpers@0.5.15))(@types/node@22.13.5)(typescript@5.6.3))':
-=======
   '@jest/core@29.7.0':
     dependencies:
       '@jest/console': 29.7.0
@@ -17298,7 +17286,6 @@ snapshots:
       - ts-node
 
   '@jest/core@29.7.0(ts-node@10.9.2(@swc/core@1.11.5(@swc/helpers@0.5.15))(@types/node@22.13.7)(typescript@5.6.3))':
->>>>>>> cef3996b9 (feat: add multisig contract)
     dependencies:
       '@jest/console': 29.7.0
       '@jest/reporters': 29.7.0
@@ -20395,7 +20382,7 @@ snapshots:
 
   axios@1.8.1:
     dependencies:
-      follow-redirects: 1.15.9
+      follow-redirects: 1.15.9(debug@4.3.7)
       form-data: 4.0.2
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
@@ -21301,9 +21288,6 @@ snapshots:
       safe-buffer: 5.2.1
       sha.js: 2.4.11
 
-<<<<<<< HEAD
-  create-jest@29.7.0(@types/node@22.13.5)(ts-node@10.9.2(@swc/core@1.11.5(@swc/helpers@0.5.15))(@types/node@22.13.5)(typescript@5.6.3)):
-=======
   create-jest@29.7.0(@types/node@22.13.7):
     dependencies:
       '@jest/types': 29.6.3
@@ -21320,7 +21304,6 @@ snapshots:
       - ts-node
 
   create-jest@29.7.0(@types/node@22.13.7)(ts-node@10.9.2(@swc/core@1.11.5(@swc/helpers@0.5.15))(@types/node@22.13.7)(typescript@5.6.3)):
->>>>>>> cef3996b9 (feat: add multisig contract)
     dependencies:
       '@jest/types': 29.6.3
       chalk: 4.1.2
@@ -22925,8 +22908,6 @@ snapshots:
 
   flatted@3.3.3: {}
 
-  follow-redirects@1.15.9: {}
-
   follow-redirects@1.15.9(debug@4.3.7):
     optionalDependencies:
       debug: 4.3.7
@@ -24217,9 +24198,6 @@ snapshots:
       - babel-plugin-macros
       - supports-color
 
-<<<<<<< HEAD
-  jest-cli@29.7.0(@types/node@22.13.5)(ts-node@10.9.2(@swc/core@1.11.5(@swc/helpers@0.5.15))(@types/node@22.13.5)(typescript@5.6.3)):
-=======
   jest-cli@29.7.0(@types/node@22.13.7):
     dependencies:
       '@jest/core': 29.7.0
@@ -24240,7 +24218,6 @@ snapshots:
       - ts-node
 
   jest-cli@29.7.0(@types/node@22.13.7)(ts-node@10.9.2(@swc/core@1.11.5(@swc/helpers@0.5.15))(@types/node@22.13.7)(typescript@5.6.3)):
->>>>>>> cef3996b9 (feat: add multisig contract)
     dependencies:
       '@jest/core': 29.7.0(ts-node@10.9.2(@swc/core@1.11.5(@swc/helpers@0.5.15))(@types/node@22.13.7)(typescript@5.6.3))
       '@jest/test-result': 29.7.0
@@ -24592,9 +24569,6 @@ snapshots:
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
-<<<<<<< HEAD
-  jest@29.7.0(@types/node@22.13.5)(ts-node@10.9.2(@swc/core@1.11.5(@swc/helpers@0.5.15))(@types/node@22.13.5)(typescript@5.6.3)):
-=======
   jest@29.7.0(@types/node@22.13.7):
     dependencies:
       '@jest/core': 29.7.0
@@ -24608,7 +24582,6 @@ snapshots:
       - ts-node
 
   jest@29.7.0(@types/node@22.13.7)(ts-node@10.9.2(@swc/core@1.11.5(@swc/helpers@0.5.15))(@types/node@22.13.7)(typescript@5.6.3)):
->>>>>>> cef3996b9 (feat: add multisig contract)
     dependencies:
       '@jest/core': 29.7.0(ts-node@10.9.2(@swc/core@1.11.5(@swc/helpers@0.5.15))(@types/node@22.13.7)(typescript@5.6.3))
       '@jest/types': 29.6.3

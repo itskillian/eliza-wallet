@@ -22,7 +22,6 @@ import { defaultCharacter } from "./defaultCharacter.ts";
 
 import { bootstrapPlugin } from "@elizaos/plugin-bootstrap";
 import { agentKitPlugin } from "@elizaos/plugin-agentkit";
-import { helloworld } from "./helloworld";
 import { topup } from "./topup.ts";
 import { walletManagement } from "./wallet_management.ts";
 
@@ -621,7 +620,7 @@ export async function createAgent(
             .filter(Boolean),
         providers: [],
         managers: [],
-        actions: [helloworld, topup, walletManagement],
+        actions: [topup, walletManagement],
         fetch: logFetch,
         // verifiableInferenceAdapter,
     });
