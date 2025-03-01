@@ -19,7 +19,7 @@ function App() {
     return (
         <QueryClientProvider client={queryClient}>
             <div
-                className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700"
+                className="bg-gradient-to-br from-gray-100 to-gray-200"
                 style={{
                     colorScheme: "dark",
                 }}>

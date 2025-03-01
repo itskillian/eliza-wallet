@@ -1,27 +1,18 @@
-import { Button } from "@/components/ui/button";
-import {
-    ChatBubble,
-    ChatBubbleMessage,
-    ChatBubbleTimestamp,
-} from "@/components/ui/chat/chat-bubble";
+
+import {ChatBubble, ChatBubbleMessage } from "@/components/ui/chat/chat-bubble";
 import { ChatInput } from "@/components/ui/chat/chat-input";
 import { ChatMessageList } from "@/components/ui/chat/chat-message-list";
 import { useTransition, animated, type AnimatedProps } from "@react-spring/web";
-import { Paperclip, Send, X } from "lucide-react";
+import { Send } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { Content, UUID } from "@elizaos/core";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api";
-import { cn, moment } from "@/lib/utils";
-import { Avatar, AvatarImage } from "./ui/avatar";
-import CopyButton from "./copy-button";
-import ChatTtsButton from "./ui/chat/chat-tts-button";
-import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+
+
 import { useToast } from "@/hooks/use-toast";
-import AIWriter from "react-aiwriter";
+
 import type { IAttachment } from "@/types";
-import { AudioRecorder } from "./audio-recorder";
-import { Badge } from "./ui/badge";
 import { useAutoScroll } from "./ui/chat/hooks/useAutoScroll";
 
 type ExtraContentFields = {
@@ -41,7 +32,6 @@ export default function Page({ agentId }: { agentId: UUID }) {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [input, setInput] = useState("");
     const inputRef = useRef<HTMLTextAreaElement>(null);
-    const fileInputRef = useRef<HTMLInputElement>(null);
     const formRef = useRef<HTMLFormElement>(null);
 
     const queryClient = useQueryClient();
@@ -149,12 +139,6 @@ export default function Page({ agentId }: { agentId: UUID }) {
         },
     });
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file?.type.startsWith("image/")) {
-            setSelectedFile(file);
-        }
-    };
 
     const messages =
         queryClient.getQueryData<ContentWithUser[]>(["messages", agentId]) ||
@@ -171,7 +155,7 @@ export default function Page({ agentId }: { agentId: UUID }) {
     const CustomAnimatedDiv = animated.div as React.FC<AnimatedDivProps>;
 
     return (
-        <div className="h-full flex flex-col w-full h-[300] p-4">
+        <div className="h-full flex flex-col w-full h-[300] p-2"> {/* reduced padding */}
             <div className="flex-1 overflow-y-auto">
                 <ChatMessageList 
                     scrollRef={scrollRef}
@@ -188,93 +172,26 @@ export default function Page({ agentId }: { agentId: UUID }) {
                                     display: "flex",
                                     flexDirection: "column",
                                     gap: "0.5rem",
-                                    padding: "1rem",
+                                    padding: "0.5rem", // reduced padding
                                 }}
                             >
                                 <ChatBubble
                                     variant={variant}
-                                    className="flex flex-row items-center gap-2"
+                                    className="flex flex-row items-start gap-2 max-w-[300px]" // added max-width
                                 >
-                                    {message?.user !== "user" ? (
-                                        <Avatar className="size-8 p-1 border rounded-full select-none">
-                                            <AvatarImage src="/elizaos-icon.png" />
-                                        </Avatar>
-                                    ) : null}
-                                    <div className="flex flex-col">
+                                    <div className="flex flex-col w-full"> {/* added w-full */}
                                         <ChatBubbleMessage
                                             isLoading={message?.isLoading}
+                                            className={`${
+                                                message?.user === "user" 
+                                                    ? "bg-gray-200 text-black break-words" // added break-words
+                                                    : "bg-gray-300 text-black break-words" // added break-words
+                                            } max-w-[250px]`} // added max-width
                                         >
-                                            {message?.user !== "user" ? (
-                                                <AIWriter>
-                                                    {message?.text}
-                                                </AIWriter>
-                                            ) : (
-                                                message?.text
-                                            )}
-                                            {/* Attachments */}
-                                            <div>
-                                                {message?.attachments?.map(
-                                                    (attachment: IAttachment) => (
-                                                        <div
-                                                            className="flex flex-col gap-1 mt-2"
-                                                            key={`${attachment.url}-${attachment.title}`}
-                                                        >
-                                                            <img
-                                                                alt="attachment"
-                                                                src={attachment.url}
-                                                                width="100%"
-                                                                height="100%"
-                                                                className="w-64 rounded-md"
-                                                            />
-                                                            <div className="flex items-center justify-between gap-4">
-                                                                <span />
-                                                                <span />
-                                                            </div>
-                                                        </div>
-                                                    )
-                                                )}
+                                            <div className="overflow-hidden"> {/* added overflow control */}
+                                                {message?.text}
                                             </div>
                                         </ChatBubbleMessage>
-                                        <div className="flex items-center gap-4 justify-between w-full mt-1">
-                                            {message?.text &&
-                                            !message?.isLoading ? (
-                                                <div className="flex items-center gap-1">
-                                                    <CopyButton
-                                                        text={message?.text}
-                                                    />
-                                                    <ChatTtsButton
-                                                        agentId={agentId}
-                                                        text={message?.text}
-                                                    />
-                                                </div>
-                                            ) : null}
-                                            <div
-                                                className={cn([
-                                                    message?.isLoading
-                                                        ? "mt-2"
-                                                        : "",
-                                                    "flex items-center justify-between gap-4 select-none",
-                                                ])}
-                                            >
-                                                {message?.source ? (
-                                                    <Badge variant="outline">
-                                                        {message.source}
-                                                    </Badge>
-                                                ) : null}
-                                                {message?.action ? (
-                                                    <Badge variant="outline">
-                                                        {message.action}
-                                                    </Badge>
-                                                ) : null}
-                                                {message?.createdAt ? (
-                                                    <ChatBubbleTimestamp
-                                                        timestamp={moment(
-                                                            message?.createdAt
-                                                        ).format("LT")}
-                                                    />
-                                                ) : null}
-                                            </div>
-                                        </div>
                                     </div>
                                 </ChatBubble>
                             </CustomAnimatedDiv>
@@ -282,87 +199,30 @@ export default function Page({ agentId }: { agentId: UUID }) {
                     })}
                 </ChatMessageList>
             </div>
-            <div className="pb-4">
+            
+            {/* Input section */}
+            <div className="mt-2">
                 <form
                     ref={formRef}
                     onSubmit={handleSendMessage}
-                    className="relative rounded-md border bg-card"
+                    className="relative rounded-md bg-gray-200"
                 >
-                    {selectedFile ? (
-                        <div className="p-3 flex">
-                            <div className="relative rounded-md border p-2">
-                                <Button
-                                    onClick={() => setSelectedFile(null)}
-                                    className="absolute -right-2 -top-2 size-[22px] ring-2 ring-background"
-                                    variant="outline"
-                                    size="icon"
-                                >
-                                    <X />
-                                </Button>
-                                <img
-                                    alt="Selected file"
-                                    src={URL.createObjectURL(selectedFile)}
-                                    height="100%"
-                                    width="100%"
-                                    className="aspect-square object-contain w-16"
-                                />
-                            </div>
-                        </div>
-                    ) : null}
-                    <ChatInput
-                        ref={inputRef}
-                        onKeyDown={handleKeyDown}
-                        value={input}
-                        onChange={({ target }) => setInput(target.value)}
-                        placeholder="Type your message here..."
-                        className="min-h-12 resize-none rounded-md bg-card border-0 p-3 shadow-none focus-visible:ring-0"
-                    />
-                    <div className="flex items-center p-3 pt-0">
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <div>
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => {
-                                            if (fileInputRef.current) {
-                                                fileInputRef.current.click();
-                                            }
-                                        }}
-                                    >
-                                        <Paperclip className="size-4" />
-                                        <span className="sr-only">
-                                            Attach file
-                                        </span>
-                                    </Button>
-                                    <input
-                                        type="file"
-                                        ref={fileInputRef}
-                                        onChange={handleFileChange}
-                                        accept="image/*"
-                                        className="hidden"
-                                    />
-                                </div>
-                            </TooltipTrigger>
-                            <TooltipContent side="left">
-                                <p>Attach file</p>
-                            </TooltipContent>
-                        </Tooltip>
-                        <AudioRecorder
-                            agentId={agentId}
-                            onChange={(newInput: string) => setInput(newInput)}
+                    <div className="flex items-center">
+                        <ChatInput
+                            ref={inputRef}
+                            onKeyDown={handleKeyDown}
+                            value={input}
+                            onChange={({ target }) => setInput(target.value)}
+                            placeholder="Type your message here..."
+                            className="min-h-10 resize-none rounded-l-md bg-gray-200 border-0 p-2 pr-12 shadow-none focus-visible:ring-0 text-black placeholder:text-gray-500 w-full"
                         />
-                        <Button
-                            disabled={!input || sendMessageMutation?.isPending}
+                        <button
                             type="submit"
-                            size="sm"
-                            className="ml-auto gap-1.5 h-[30px]"
+                            className="absolute right-2 p-1.5 rounded-md text-gray-500 hover:text-gray-700 transition-colors"
+                            disabled={!input.trim()}
                         >
-                            {sendMessageMutation?.isPending
-                                ? "..."
-                                : "Send Message"}
-                            <Send className="size-3.5" />
-                        </Button>
+                            <Send className="h-5 w-5" />
+                        </button>
                     </div>
                 </form>
             </div>

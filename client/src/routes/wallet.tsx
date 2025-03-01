@@ -107,15 +107,17 @@ export default function Wallet() {
 
             assetData.forEach((item) => {
                 const sliceAngle = totalValue > 0 ? (item.value / totalValue) * 2 * Math.PI : 2 * Math.PI;
-                const endAngle = startAngle + sliceAngle;
+                // Add padding angle (0.03 radians ≈ 2 degrees)
+                const paddingAngle = 0.03;
+                const endAngle = startAngle + sliceAngle - paddingAngle;
 
                 const gradient = ctx.createLinearGradient(centerX - outerRadius, centerY, centerX + outerRadius, centerY);
                 if (item.name === "ETH") {
-                    gradient.addColorStop(0, "#3b82f6");
-                    gradient.addColorStop(1, "#1e40af");
+                    gradient.addColorStop(0, "#60a5fa"); 
+                    gradient.addColorStop(1, "#2563eb");
+             
                 } else if (item.name === "USDC") {
-                    gradient.addColorStop(0, "#22c55e");
-                    gradient.addColorStop(1, "#15803d");
+                    gradient.addColorStop(1, "#9333ea");
                 }
 
                 ctx.beginPath();
@@ -126,16 +128,25 @@ export default function Wallet() {
                 ctx.fillStyle = gradient;
                 ctx.fill();
 
-                startAngle = endAngle;
+                // Update startAngle to include the padding
+                startAngle = endAngle + paddingAngle;
             });
 
-            ctx.fillStyle = "#fff";
-            ctx.font = "16px sans-serif";
+            // Clear previous text
+            ctx.clearRect(centerX - 50, centerY - 20, 100, 40);
+
+            // Draw the dollar value
+            ctx.fillStyle = "#111827";
+            ctx.font = "bold 16px sans-serif";
             ctx.textAlign = "center";
-            const ethPercentage = totalValue > 0 ? ((assetData[0].value / totalValue) * 100).toFixed(0) : 0;
-            const usdcPercentage = totalValue > 0 ? ((assetData[1].value / totalValue) * 100).toFixed(0) : 0;
-            const displayedPercentage = displayedAsset === "ETH" ? ethPercentage : usdcPercentage;
-            ctx.fillText(`${displayedPercentage}% ${displayedAsset}`, centerX, centerY);
+            ctx.textBaseline = "middle";
+
+            // Format the USD value
+            const assetValue = displayedAsset === "ETH" ? usdValue : 0; // Add USDC value here if needed
+            const formattedValue = `$${assetValue.toFixed(2)}`;
+
+            // Draw the value
+            ctx.fillText(formattedValue, centerX, centerY);
         }
     }, [activeView, balanceQuery.isSuccess, balanceQuery.data, displayedAsset]);
 
@@ -156,19 +167,19 @@ export default function Wallet() {
     const handleReceive = () => console.log("Receive button clicked");
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center p-6 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700">
-            <div className="w-[420px] h-[720px] bg-gray-900/80 backdrop-blur-xl rounded-2xl border border-gray-700/50 shadow-2xl flex flex-col overflow-hidden transform transition-transform duration-300">
+        <div className="min-h-screen w-full flex items-center justify-center p-6">
+            <div className="relative w-[420px] h-[720px] bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col overflow-hidden">
                 {/* Wallet Balance - Top Section */}
-                <div className="p-6 pb-4 border-b border-gray-700/50 bg-gradient-to-r from-gray-800/50 to-gray-900/50">
-                    <h2 className="text-2xl font-bold text-white bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">GM Wallet</h2>
+                <div className="p-6 pb-4 border-b border-gray-100">
+                    <h2 className="text-2xl font-bold text-gray-900 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">GM Wallet</h2>
                     {balanceQuery.isLoading || priceQuery.isLoading ? (
-                        <p className="text-gray-400 text-sm mt-2 animate-pulse">Loading balance...</p>
+                        <p className="text-gray-500 text-sm mt-2 animate-pulse">Loading balance...</p>
                     ) : balanceQuery.isError || priceQuery.isError ? (
-                        <p className="text-red-400 text-sm mt-2">Error loading balance</p>
+                        <p className="text-red-500 text-sm mt-2">Error loading balance</p>
                     ) : (
                         <div className="text-center mt-3">
-                            <p className="text-4xl font-extrabold text-white drop-shadow-md">${usdValue.toFixed(2)}</p>
-                            <p className="text-sm text-gray-300 mt-1">{ethBalance.toFixed(3)} ETH</p>
+                            <p className="text-4xl font-extrabold text-gray-900 drop-shadow-md">${usdValue.toFixed(2)}</p>
+                            <p className="text-sm text-gray-500 mt-1">{ethBalance.toFixed(3)} ETH</p>
                         </div>
                     )}
                 </div>
@@ -180,8 +191,8 @@ export default function Wallet() {
                         onClick={() => setActiveView("assets")}
                         className={`flex-1 py-2 text-sm font-semibold rounded-xl transition-all duration-300 bg-gradient-to-r ${
                             activeView === "assets"
-                                ? "from-gray-500 to-gray-600 text-white shadow-lg active:from-gray-600 active:to-gray-700"
-                                : "from-gray-800/50 to-gray-800/50 text-gray-300 border-gray-600 hover:from-gray-700 hover:to-gray-700 active:from-gray-700 active:to-gray-700"
+                                ? "from-gray-200 to-gray-300 text-gray-700 shadow-md active:from-gray-300 active:to-gray-400"
+                                : "from-gray-100 to-gray-100 text-gray-600 border-gray-200 hover:bg-gray-100 hover:text-gray-700"
                         }`}
                     >
                         Assets
@@ -191,10 +202,9 @@ export default function Wallet() {
                         onClick={() => setActiveView("transactions")}
                         className={`flex-1 py-2 text-sm font-semibold rounded-xl transition-all duration-300 bg-gradient-to-r ${
                             activeView === "transactions"
-                                ? "from-gray-500 to-gray-600 text-white shadow-lg active:from-gray-600 active:to-gray-700"
-                                : "from-gray-800/50 to-gray-800/50 text-gray-300 border-gray-600 hover:from-gray-700 hover:to-gray-700 active:from-gray-700 active:to-gray-700"
-                        }`}
-                    >
+                                ? "from-gray-200 to-gray-300 text-gray-700 shadow-md active:from-gray-300 active:to-gray-400"
+                                : "from-gray-100 to-gray-100 text-gray-600 border-gray-200 hover:bg-gray-100 hover:text-gray-700"
+                        }`}>
                         Transactions
                     </Button>
                 </div>
@@ -204,38 +214,38 @@ export default function Wallet() {
                     {activeView === "assets" ? (
                         <div className="flex flex-col items-center justify-center h-full">
                             {balanceQuery.isLoading ? (
-                                <p className="text-gray-400 text-sm animate-pulse">Loading assets...</p>
+                                <p className="text-gray-500 text-sm animate-pulse">Loading assets...</p>
                             ) : balanceQuery.isError ? (
-                                <p className="text-red-400 text-sm">Error: {balanceQuery.error?.message}</p>
+                                <p className="text-red-500 text-sm">Error: {balanceQuery.error?.message}</p>
                             ) : (
-                                <div className="p-4 bg-gray-800/50 rounded-full shadow-inner border border-gray-700/50">
-                                    <canvas ref={canvasRef} className="text-white" />
+                                <div className="p-4 bg-gray-50 rounded-full shadow-inner border border-gray-100">
+                                    <canvas ref={canvasRef} className="text-gray-900" />
                                 </div>
                             )}
                         </div>
                     ) : (
                         <div>
-                            <h3 className="text-lg font-semibold text-white mb-3">Transactions</h3>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-3">Transactions</h3>
                             {transactionsQuery.isLoading ? (
                                 <div className="flex justify-center items-center h-full">
                                     <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-400" />
                                 </div>
                             ) : transactionsQuery.isError ? (
-                                <p className="text-red-400 text-sm">Error: {transactionsQuery.error?.message}</p>
+                                <p className="text-red-500 text-sm">Error: {transactionsQuery.error?.message}</p>
                             ) : transactionsQuery.data?.length === 0 ? (
-                                <p className="text-gray-400 text-sm">No transactions found.</p>
+                                <p className="text-gray-500 text-sm">No transactions found.</p>
                             ) : (
-                                <div className="space-y-4">
+                                <div className="space-y-3">
                                     {transactionsQuery.data!.map((tx: Transaction) => {
                                         const value = tx.value;
                                         const direction = tx.direction === "sent" ? "Sent" : "Received";
                                         return (
                                             <div
                                                 key={tx.hash}
-                                                className="p-4 rounded-xl bg-gradient-to-r from-gray-800/70 to-gray-700/70 border border-gray-600/50 shadow-md hover:shadow-xl hover:bg-gray-700/90 transition-all duration-300"
+                                                className="p-4 rounded-xl bg-gray-50 border border-gray-100 hover:bg-gray-100 transition-all duration-300"
                                             >
                                                 <div className="flex justify-between items-center">
-                                                    <span className="text-white font-semibold capitalize text-sm">{direction}</span>
+                                                    <span className="text-gray-900 font-semibold capitalize text-sm">{direction}</span>
                                                     <span className="text-green-400 font-bold text-sm">{value} ETH</span>
                                                 </div>
                                             </div>
@@ -248,16 +258,16 @@ export default function Wallet() {
                 </div>
 
                 {/* Action Buttons - Bottom Section */}
-                <div className="border-t border-gray-700/50 p-6 flex gap-3 bg-gray-900/80">
+                <div className="border-t border-gray-100 p-6 flex gap-3 bg-white">
                     <Button
                         onClick={handleSend}
-                        className="flex-1 py-3 text-sm font-semibold rounded-xl bg-gradient-to-r from-gray-500 to-gray-600 text-white hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-md"
+                        className="flex-1 py-3 text-sm font-semibold rounded-xl bg-gradient-to-r from-gray-400 to-gray-500 text-white hover:from-gray-500 hover:to-gray-600 transition-all duration-300 shadow-sm"
                     >
                         Send
                     </Button>
                     <Button
                         onClick={handleReceive}
-                        className="flex-1 py-3 text-sm font-semibold rounded-xl bg-gradient-to-r from-gray-500 to-gray-600 text-white hover:from-green-600 hover:to-green-700 transition-all duration-300 shadow-md"
+                        className="flex-1 py-3 text-sm font-semibold rounded-xl bg-gradient-to-r from-gray-400 to-gray-500 text-white hover:from-gray-500 hover:to-gray-600 transition-all duration-300 shadow-sm"
                     >
                         Receive
                     </Button>
@@ -271,14 +281,14 @@ export default function Wallet() {
 
                 {/* Chat Modal */}
                 {isChatOpen && (
-                    <div className="absolute inset-0 bg-gray-900/90 backdrop-blur-md rounded-2xl border border-gray-700/50 p-6 flex flex-col shadow-2xl">
+                    <div className="absolute top-0 left-0 w-[420px] h-[720px] bg-white rounded-3xl border border-gray-100 p-6 flex flex-col shadow-md z-10">
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-lg font-bold text-white bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">Chat</h3>
+                            <h3 className="text-lg font-bold text-gray-900 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">Chat</h3>
                             <Button
                                 variant="ghost"
                                 size="icon"
                                 onClick={() => setIsChatOpen(false)}
-                                className="text-gray-300 hover:text-white hover:bg-gray-700/50 rounded-full transition-all duration-200"
+                                className="text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-all duration-200"
                             >
                                 <X className="h-5 w-5" />
                             </Button>
@@ -287,7 +297,7 @@ export default function Wallet() {
                             {firstAgent ? (
                                 <Chat agentId={firstAgent.id} />
                             ) : (
-                                <p className="text-gray-400 text-sm animate-pulse">Loading chat...</p>
+                                <p className="text-gray-500 text-sm animate-pulse">Loading chat...</p>
                             )}
                         </div>
                     </div>
