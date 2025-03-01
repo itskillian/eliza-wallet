@@ -5,7 +5,7 @@ import path from "node:path";
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
-    const envDir = path.resolve(__dirname, "..");
+    const envDir = path.resolve(__dirname); 
     const env = loadEnv(mode, envDir, "");
     return {
         plugins: [
@@ -17,7 +17,7 @@ export default defineConfig(({ mode }) => {
             }),
         ],
         clearScreen: false,
-        envDir,
+        envDir, // Use the current directory (client/)
         define: {
             "import.meta.env.VITE_SERVER_PORT": JSON.stringify(
                 env.SERVER_PORT || "3000"
@@ -26,8 +26,11 @@ export default defineConfig(({ mode }) => {
                 env.SERVER_URL || "http://localhost"
             ),
             "import.meta.env.VITE_SERVER_BASE_URL": JSON.stringify(
-                env.SERVER_BASE_URL
-            )
+                env.SERVER_BASE_URL || ""
+            ),
+            // Add your new variables here to ensure they’re exposed
+            "import.meta.env.VITE_API_KEY": JSON.stringify(env.VITE_API_KEY || ""),
+            "import.meta.env.VITE_WALLET_ADDRESS": JSON.stringify(env.VITE_WALLET_ADDRESS || ""),
         },
         build: {
             outDir: "dist",
