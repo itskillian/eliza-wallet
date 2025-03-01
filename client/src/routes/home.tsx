@@ -3,7 +3,9 @@ import { Button } from "@/components/ui/button";
 import { apiClient } from "@/lib/api";
 import { useWalletTransactions } from "@/components/WalletTransactions";
 import Chat from "@/components/chat";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react"; // Added useRef and useEffect
+import { Wallet } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface Transaction {
     hash: string;
@@ -14,8 +16,16 @@ interface Transaction {
     blockNum: string;
 }
 
+interface Asset {
+    name: string;
+    value: number;
+    color: string;
+}
+
 export default function Home() {
     const [activeView, setActiveView] = useState<"transactions" | "assets">("transactions");
+    const [displayedAsset, setDisplayedAsset] = useState<"ETH" | "USDC">("ETH"); // Added for toggling ETH/USDC
+    const canvasRef = useRef<HTMLCanvasElement>(null); // Added for canvas reference
     const agentsQuery = useQuery({
         queryKey: ["agents"],
         queryFn: () => apiClient.getAgents(),
@@ -68,14 +78,110 @@ export default function Home() {
     const ethPrice = priceQuery.isSuccess ? priceQuery.data : 0;
     const usdValue = ethBalance * ethPrice;
 
+    // Define asset data (same as Wallet)
+    const assetData: Asset[] = balanceQuery.isSuccess
+        ? [
+              { name: "ETH", value: parseFloat(balanceQuery.data), color: "#3b82f6" },
+              { name: "USDC", value: 0.5, color: "#22c55e" }, // Static USDC value as in Wallet
+          ]
+        : [{ name: "ETH", value: 0, color: "#3b82f6" }];
+
+    // Canvas rendering logic (copied from Wallet)
+    useEffect(() => {
+        if (activeView === "assets" && canvasRef.current && balanceQuery.isSuccess) {
+            const canvas = canvasRef.current;
+            const ctx = canvas.getContext("2d");
+            if (!ctx) return;
+
+            const scale = window.devicePixelRatio || 1;
+            canvas.width = 240 * scale;
+            canvas.height = 240 * scale;
+            canvas.style.width = "240px";
+            canvas.style.height = "240px";
+            ctx.scale(scale, scale);
+
+            const totalValue = assetData.reduce((sum, item) => sum + item.value, 0);
+            const centerX = 120;
+            const centerY = 120;
+            const outerRadius = 100;
+            const innerRadius = 60;
+            let startAngle = -Math.PI / 2;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            assetData.forEach((item) => {
+                const sliceAngle = totalValue > 0 ? (item.value / totalValue) * 2 * Math.PI : 2 * Math.PI;
+                const paddingAngle = 0.03;
+                const endAngle = startAngle + sliceAngle - paddingAngle;
+
+                const gradient = ctx.createLinearGradient(centerX - outerRadius, centerY, centerX + outerRadius, centerY);
+                if (item.name === "ETH") {
+                  
+                    gradient.addColorStop(1, "#2563eb");
+                } else if (item.name === "USDC") {
+                
+                    gradient.addColorStop(1, "#9333ea");
+                }
+
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, outerRadius, startAngle, endAngle);
+                ctx.arc(centerX, centerY, innerRadius, endAngle, startAngle, true);
+                ctx.closePath();
+
+                ctx.fillStyle = gradient;
+                ctx.fill();
+
+                startAngle = endAngle + paddingAngle;
+            });
+
+            ctx.clearRect(centerX - 50, centerY - 20, 100, 40);
+            ctx.fillStyle = "#111827";
+            ctx.font = "bold 16px sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+
+            const assetValue = displayedAsset === "ETH" ? usdValue : 0; // USDC value is static, no USD conversion yet
+            const formattedValue = `$${assetValue.toFixed(2)}`;
+            ctx.fillText(formattedValue, centerX, centerY);
+        }
+    }, [activeView, balanceQuery.isSuccess, balanceQuery.data, displayedAsset]);
+
+    // Handle canvas click to toggle between ETH and USDC
+    const handleCanvasClick = () => {
+        setDisplayedAsset((prev) => (prev === "ETH" ? "USDC" : "ETH"));
+    };
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (canvas) {
+            canvas.style.cursor = "pointer";
+            canvas.addEventListener("click", handleCanvasClick);
+            return () => canvas.removeEventListener("click", handleCanvasClick);
+        }
+    }, []);
+
     return (
         <div className="min-h-screen w-full p-6 bg-gray-50">
             <div className="flex gap-6 h-[calc(100vh-48px)] max-w-7xl mx-auto">
                 {/* Left Side Container */}
                 <div className="w-1/3 flex flex-col gap-6">
+
                     {/* Wallet Balance Section */}
                     <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-shadow duration-300">
-                        <h2 className="text-xl font-semibold text-gray-900 bg-gradient-to-r from-indigo-500 to-blue-500 bg-clip-text text-transparent mb-4">Wallet Balance</h2>
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-xl font-semibold text-gray-900 bg-gradient-to-r from-indigo-500 to-blue-500 bg-clip-text text-transparent">
+                                GM Wallet
+                            </h2>
+                            <Link to="/">
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors duration-200"
+                                >
+                                    <Wallet className="h-4 w-4 text-gray-600" />
+                                </Button>
+                            </Link>
+                        </div>
                         {balanceQuery.isLoading || priceQuery.isLoading ? (
                             <p className="text-gray-500 text-sm animate-pulse">Loading balance...</p>
                         ) : balanceQuery.isError || priceQuery.isError ? (
@@ -135,8 +241,18 @@ export default function Home() {
                                                     className="p-4 rounded-xl bg-gray-50 border border-gray-100 hover:bg-gray-100 transition-all duration-300"
                                                 >
                                                     <div className="flex justify-between items-center">
-                                                        <span className="text-gray-900 font-medium capitalize text-sm">{direction}</span>
-                                                        <span className="text-indigo-500 font-semibold text-sm">{value} ETH</span>
+                                                        <span className="text-gray-900 font-medium capitalize text-sm">
+                                                            {direction}
+                                                        </span>
+                                                        <span 
+                                                            className={`font-semibold text-sm ${
+                                                                direction === "Sent" 
+                                                                    ? "text-rose-700" 
+                                                                    : "text-green-600"
+                                                            }`}
+                                                        >
+                                                            {value} ETH
+                                                        </span>
                                                     </div>
                                                 </div>
                                             );
@@ -144,7 +260,17 @@ export default function Home() {
                                     </div>
                                 )
                             ) : (
-                                <div className="text-sm text-gray-500">Assets view coming soon...</div>
+                                <div className="flex flex-col items-center justify-center h-full">
+                                    {balanceQuery.isLoading ? (
+                                        <p className="text-gray-500 text-sm animate-pulse">Loading assets...</p>
+                                    ) : balanceQuery.isError ? (
+                                        <p className="text-red-500 text-sm">Error: {balanceQuery.error?.message}</p>
+                                    ) : (
+                                        <div className="p-4 bg-gray-50 rounded-full shadow-inner border border-gray-100">
+                                            <canvas ref={canvasRef} className="text-gray-900" />
+                                        </div>
+                                    )}
+                                </div>
                             )}
                         </div>
                     </div>

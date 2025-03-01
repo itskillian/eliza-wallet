@@ -27,8 +27,8 @@ function App() {
                     <TooltipProvider delayDuration={0}>
                         <div className="flex flex-1 flex-col gap-4 size-full container">
                             <Routes>
-                                <Route path="/" element={<Home />} />
-                                <Route path="/wallet" element={<Wallet />} />   
+                                <Route path="/" element={<Wallet />} />
+                                <Route path="/home" element={<Home />} />   
                             </Routes>
                         </div>
                         <Toaster />

@@ -4,7 +4,8 @@ import { useWalletTransactions } from "@/components/WalletTransactions";
 import Chat from "@/components/chat";
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { X, Home } from "lucide-react"; // Replace Square with Home
+import { Link } from "react-router-dom";
 
 interface Transaction {
     hash: string;
@@ -99,8 +100,8 @@ export default function Wallet() {
             const totalValue = assetData.reduce((sum, item) => sum + item.value, 0);
             const centerX = 120;
             const centerY = 120;
-            const outerRadius = 90;
-            const innerRadius = 80;
+            const outerRadius = 100;
+            const innerRadius = 60;
             let startAngle = -Math.PI / 2;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -169,6 +170,20 @@ export default function Wallet() {
     return (
         <div className="min-h-screen w-full flex items-center justify-center p-6">
             <div className="relative w-[420px] h-[720px] bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col overflow-hidden">
+                {/* Add the home button */}
+                <Link
+                    to="/home"
+                    className={`absolute top-6 ${isChatOpen ? 'right-16' : 'right-6'} z-20 transition-all duration-300`}
+                >
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors duration-200"
+                    >
+                        <Home className="h-4 w-4 text-gray-600" />
+                    </Button>
+                </Link>
+
                 {/* Wallet Balance - Top Section */}
                 <div className="p-6 pb-4 border-b border-gray-100">
                     <h2 className="text-2xl font-bold text-gray-900 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">GM Wallet</h2>
@@ -246,7 +261,15 @@ export default function Wallet() {
                                             >
                                                 <div className="flex justify-between items-center">
                                                     <span className="text-gray-900 font-semibold capitalize text-sm">{direction}</span>
-                                                    <span className="text-green-400 font-bold text-sm">{value} ETH</span>
+                                                    <span 
+                                                        className={`font-bold text-sm ${
+                                                            direction === "Sent" 
+                                                                ? "text-rose-700" 
+                                                                : "text-green-600"
+                                                        }`}
+                                                    >
+                                                        {value} ETH
+                                                    </span>
                                                 </div>
                                             </div>
                                         );
@@ -281,7 +304,7 @@ export default function Wallet() {
 
                 {/* Chat Modal */}
                 {isChatOpen && (
-                    <div className="absolute top-0 left-0 w-[420px] h-[720px] bg-white rounded-3xl border border-gray-100 p-6 flex flex-col shadow-md z-10">
+                    <div className="absolute inset-0 bg-white rounded-3xl border border-gray-100 p-6 flex flex-col shadow-md z-10">
                         <div className="flex justify-between items-center mb-4">
                             <h3 className="text-lg font-bold text-gray-900 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">Chat</h3>
                             <Button
