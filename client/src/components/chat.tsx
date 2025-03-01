@@ -171,7 +171,7 @@ export default function Page({ agentId }: { agentId: UUID }) {
     const CustomAnimatedDiv = animated.div as React.FC<AnimatedDivProps>;
 
     return (
-        <div className="flex flex-col w-full h-[calc(100dvh)] p-4">
+        <div className="h-full flex flex-col w-full h-[300] p-4">
             <div className="flex-1 overflow-y-auto">
                 <ChatMessageList 
                     scrollRef={scrollRef}
@@ -282,7 +282,7 @@ export default function Page({ agentId }: { agentId: UUID }) {
                     })}
                 </ChatMessageList>
             </div>
-            <div className="px-4 pb-4">
+            <div className="pb-4">
                 <form
                     ref={formRef}
                     onSubmit={handleSendMessage}
